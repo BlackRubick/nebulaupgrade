@@ -1,0 +1,167 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  ADMIN
+  VENDOR
+  SCANNER
+}
+
+enum EventStatus {
+  DRAFT
+  ACTIVE
+  FINISHED
+  CANCELLED
+}
+
+enum TicketStatus {
+  AVAILABLE
+  USED
+  CANCELLED
+}
+
+model User {
+  id           String   @id @default(cuid())
+  name         String
+  email        String   @unique
+  password     String
+  role         UserRole @default(VENDOR)
+  isSuperAdmin Boolean  @default(false)
+  active       Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  events       Event[]
+  tickets      Ticket[]   @relation("SellerTickets")
+  scanLogs     ScanLog[]
+  auditLogs    AuditLog[]
+  refreshTokens RefreshToken[]
+
+  @@map("users")
+}
+
+model RefreshToken {
+  id        String   @id @default(cuid())
+  token     String   @unique
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@map("refresh_tokens")
+}
+
+model Event {
+  id          String      @id @default(cuid())
+  name        String
+  description String      @db.Text
+  image       String?
+  gallery     Json?
+  date        DateTime
+  location    String
+  capacity    Int
+  status      EventStatus @default(DRAFT)
+  createdById String
+  createdBy   User        @relation(fields: [createdById], references: [id])
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  phases   TicketPhase[]
+  tickets  Ticket[]
+  scanLogs ScanLog[]
+
+  @@map("events")
+}
+
+model TicketPhase {
+  id          String    @id @default(cuid())
+  eventId     String
+  event       Event     @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  phaseName   String
+  ticketPrice Decimal   @db.Decimal(10, 2)
+  startDate   DateTime?
+  endDate     DateTime?
+  isActive    Boolean   @default(true)
+  order       Int       @default(0)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  tickets Ticket[]
+
+  @@map("ticket_phases")
+}
+
+model Buyer {
+  id        String   @id @default(cuid())
+  name      String
+  phone     String
+  email     String?
+  curp      String?
+  notes     String?  @db.Text
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  tickets Ticket[]
+
+  @@map("buyers")
+}
+
+model Ticket {
+  id         String       @id @default(cuid())
+  uuid       String       @unique @default(uuid())
+  folio      String       @unique
+  qrCode     String?      @db.Text
+  status     TicketStatus @default(AVAILABLE)
+  soldPrice  Decimal      @db.Decimal(10, 2)
+  soldAt     DateTime     @default(now())
+  phaseId    String
+  phase      TicketPhase  @relation(fields: [phaseId], references: [id])
+  sellerId   String
+  seller     User         @relation("SellerTickets", fields: [sellerId], references: [id])
+  buyerId    String
+  buyer      Buyer        @relation(fields: [buyerId], references: [id])
+  eventId    String
+  event      Event        @relation(fields: [eventId], references: [id])
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
+
+  scanLogs ScanLog[]
+
+  @@map("tickets")
+}
+
+model ScanLog {
+  id         String   @id @default(cuid())
+  ticketId   String
+  ticket     Ticket   @relation(fields: [ticketId], references: [id])
+  scannerId  String
+  scanner    User     @relation(fields: [scannerId], references: [id])
+  eventId    String
+  event      Event    @relation(fields: [eventId], references: [id])
+  scannedAt  DateTime @default(now())
+  ipAddress  String?
+
+  @@map("scan_logs")
+}
+
+model AuditLog {
+  id         String   @id @default(cuid())
+  userId     String?
+  user       User?    @relation(fields: [userId], references: [id])
+  action     String
+  entity     String
+  entityId   String?
+  oldValues  Json?
+  newValues  Json?
+  ipAddress  String?
+  userAgent  String?
+  createdAt  DateTime @default(now())
+
+  @@map("audit_logs")
+}
