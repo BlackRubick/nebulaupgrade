@@ -4,6 +4,19 @@ import { prisma } from '../../db/client'
 export default defineEventHandler(async (event) => {
   requireAdmin(event)
 
+  // IDs de super admins — sus boletos no cuentan como ventas
+  const superAdmins = await prisma.user.findMany({
+    where: { isSuperAdmin: true },
+    select: { id: true },
+  })
+  const superAdminIds = superAdmins.map(u => u.id)
+  const excludeSuperAdmin = superAdminIds.length
+    ? { NOT: { sellerId: { in: superAdminIds } } }
+    : {}
+
+  const notCancelled = { status: { not: 'CANCELLED' } } as const
+  const ticketBase = { ...notCancelled, ...excludeSuperAdmin }
+
   const [
     activeEvents,
     finishedEvents,
@@ -16,20 +29,21 @@ export default defineEventHandler(async (event) => {
     prisma.event.count({ where: { status: 'FINISHED' } }),
     prisma.ticket.groupBy({
       by: ['status'],
+      where: excludeSuperAdmin,
       _count: { status: true },
     }),
     prisma.ticket.aggregate({
-      where: { status: { not: 'CANCELLED' } },
+      where: ticketBase,
       _sum: { soldPrice: true },
     }),
     prisma.ticketPhase.findMany({
       include: {
         event: { select: { name: true } },
-        _count: { select: { tickets: { where: { status: { not: 'CANCELLED' } } } } },
+        _count: { select: { tickets: { where: ticketBase } } },
       },
     }),
     prisma.user.findMany({
-      where: { role: 'VENDOR' },
+      where: { role: 'VENDOR', isSuperAdmin: false },
       select: { id: true, name: true },
     }),
   ])
@@ -45,9 +59,9 @@ export default defineEventHandler(async (event) => {
       id: true,
       name: true,
       status: true,
-      _count: { select: { tickets: { where: { status: { not: 'CANCELLED' } } } } },
+      _count: { select: { tickets: { where: ticketBase } } },
       tickets: {
-        where: { status: { not: 'CANCELLED' } },
+        where: ticketBase,
         select: { soldPrice: true },
       },
     },
@@ -64,7 +78,7 @@ export default defineEventHandler(async (event) => {
   const phaseSummary = await Promise.all(
     phaseBreakdown.map(async (phase) => {
       const revenue = await prisma.ticket.aggregate({
-        where: { phaseId: phase.id, status: { not: 'CANCELLED' } },
+        where: { phaseId: phase.id, ...ticketBase },
         _sum: { soldPrice: true },
       })
       return {
@@ -82,20 +96,20 @@ export default defineEventHandler(async (event) => {
     vendorList.map(async (v) => {
       const [ticketCount, revenue, lastTicket, phaseGroups] = await Promise.all([
         prisma.ticket.count({
-          where: { sellerId: v.id, status: { not: 'CANCELLED' } },
+          where: { sellerId: v.id, ...notCancelled },
         }),
         prisma.ticket.aggregate({
-          where: { sellerId: v.id, status: { not: 'CANCELLED' } },
+          where: { sellerId: v.id, ...notCancelled },
           _sum: { soldPrice: true },
         }),
         prisma.ticket.findFirst({
-          where: { sellerId: v.id, status: { not: 'CANCELLED' } },
+          where: { sellerId: v.id, ...notCancelled },
           orderBy: { soldAt: 'desc' },
           select: { soldAt: true },
         }),
         prisma.ticket.groupBy({
           by: ['phaseId'],
-          where: { sellerId: v.id, status: { not: 'CANCELLED' } },
+          where: { sellerId: v.id, ...notCancelled },
           _count: { id: true },
           _sum: { soldPrice: true },
         }),

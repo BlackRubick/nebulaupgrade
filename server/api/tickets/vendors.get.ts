@@ -5,7 +5,7 @@ export default defineEventHandler(async (event) => {
   requireAdmin(event)
 
   const vendors = await prisma.user.findMany({
-    where: { role: { in: ['ADMIN', 'VENDOR'] }, active: true },
+    where: { role: { in: ['ADMIN', 'VENDOR'] }, active: true, isSuperAdmin: false },
     select: {
       id: true,
       name: true,

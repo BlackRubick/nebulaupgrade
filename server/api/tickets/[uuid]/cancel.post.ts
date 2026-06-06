@@ -12,16 +12,21 @@ export default defineEventHandler(async (event) => {
   })
 
   if (!ticket) throw createError({ statusCode: 404, message: 'Boleto no encontrado' })
+  if (ticket.status === 'CANCELLED') throw createError({ statusCode: 400, message: 'El boleto ya está cancelado' })
 
-  await prisma.ticket.delete({ where: { uuid } })
+  await prisma.ticket.update({
+    where: { uuid },
+    data: { status: 'CANCELLED' },
+  })
 
   const ip = getRequestIP(event)
   await createAuditLog({
     userId: admin.userId,
-    action: 'DELETE_TICKET',
+    action: 'CANCEL_TICKET',
     entity: 'Ticket',
     entityId: ticket.id,
     oldValues: { folio: ticket.folio, status: ticket.status, buyer: ticket.buyer?.name },
+    newValues: { status: 'CANCELLED' },
     ipAddress: ip,
   })
 

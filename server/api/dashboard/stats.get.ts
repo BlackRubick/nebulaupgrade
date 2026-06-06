@@ -8,7 +8,23 @@ export default defineEventHandler(async (event) => {
   const isAdmin = user.role === 'ADMIN' || user.isSuperAdmin
   const sellerId = isAdmin ? undefined : user.userId
 
-  const ticketWhere = sellerId ? { sellerId } : {}
+  // Excluir siempre boletos de super admins de las estadísticas
+  const superAdmins = await prisma.user.findMany({
+    where: { isSuperAdmin: true },
+    select: { id: true },
+  })
+  const superAdminIds = superAdmins.map(u => u.id)
+
+  const baseWhere = {
+    ...(sellerId ? { sellerId } : {}),
+    ...(superAdminIds.length ? { sellerId: { notIn: superAdminIds } } : {}),
+  }
+
+  // Si hay sellerId específico Y superAdminIds, combinar correctamente
+  const ticketWhere = sellerId
+    ? { sellerId, ...(superAdminIds.length ? { NOT: { sellerId: { in: superAdminIds } } } : {}) }
+    : (superAdminIds.length ? { NOT: { sellerId: { in: superAdminIds } } } : {})
+
   const eventWhere = sellerId ? { createdById: sellerId } : {}
 
   const [
@@ -36,21 +52,35 @@ export default defineEventHandler(async (event) => {
       orderBy: { soldAt: 'desc' },
       take: 10,
     }),
-    prisma.$queryRaw<Array<{ date: string, count: bigint, revenue: number }>>`
-      SELECT
-        DATE(soldAt) as date,
-        COUNT(*) as count,
-        SUM(CAST(soldPrice AS DECIMAL(10,2))) as revenue
-      FROM tickets
-      WHERE status != 'CANCELLED'
-      ${sellerId ? Prisma.sql`AND sellerId = ${sellerId}` : Prisma.empty}
-      AND soldAt >= DATE_SUB(NOW(), INTERVAL 30 DAY)
-      GROUP BY DATE(soldAt)
-      ORDER BY date ASC
-    `,
+    superAdminIds.length
+      ? prisma.$queryRaw<Array<{ date: string, count: bigint, revenue: number }>>`
+          SELECT
+            DATE(soldAt) as date,
+            COUNT(*) as count,
+            SUM(CAST(soldPrice AS DECIMAL(10,2))) as revenue
+          FROM tickets
+          WHERE status != 'CANCELLED'
+          ${sellerId ? Prisma.sql`AND sellerId = ${sellerId}` : Prisma.empty}
+          AND sellerId NOT IN (${Prisma.join(superAdminIds)})
+          AND soldAt >= DATE_SUB(NOW(), INTERVAL 30 DAY)
+          GROUP BY DATE(soldAt)
+          ORDER BY date ASC
+        `
+      : prisma.$queryRaw<Array<{ date: string, count: bigint, revenue: number }>>`
+          SELECT
+            DATE(soldAt) as date,
+            COUNT(*) as count,
+            SUM(CAST(soldPrice AS DECIMAL(10,2))) as revenue
+          FROM tickets
+          WHERE status != 'CANCELLED'
+          ${sellerId ? Prisma.sql`AND sellerId = ${sellerId}` : Prisma.empty}
+          AND soldAt >= DATE_SUB(NOW(), INTERVAL 30 DAY)
+          GROUP BY DATE(soldAt)
+          ORDER BY date ASC
+        `,
     isAdmin
       ? prisma.user.findMany({
-          where: { role: 'VENDOR' },
+          where: { role: 'VENDOR', isSuperAdmin: false },
           select: {
             id: true,
             name: true,

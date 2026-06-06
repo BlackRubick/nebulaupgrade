@@ -8,7 +8,10 @@ export default defineEventHandler(async (event) => {
   }
   const query = getQuery(event)
 
-  const where: Record<string, unknown> = {}
+  const where: Record<string, unknown> = {
+    // Nunca mostrar boletos creados por super admins como ventas
+    seller: { isSuperAdmin: false },
+  }
 
   if (user.role === 'VENDOR' && !user.isSuperAdmin) {
     where.sellerId = user.userId
