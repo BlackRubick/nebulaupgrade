@@ -12,6 +12,7 @@ export default defineEventHandler(async (event) => {
       role: true,
       isSuperAdmin: true,
       active: true,
+      canSell: true,
       createdAt: true,
       _count: { select: { tickets: true } },
     },
