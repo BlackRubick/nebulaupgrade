@@ -250,29 +250,29 @@
       </div>
     </template>
 
-    <!-- ── MODAL DESACTIVAR ──────────────────────────── -->
+    <!-- ── MODAL ELIMINAR ────────────────────────────── -->
     <Transition name="modal">
       <div v-if="cancelTarget" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm" @click.self="cancelTarget = null">
         <div class="card-nebula p-6 w-full max-w-sm">
           <div class="flex items-center gap-3 mb-4">
             <div class="w-10 h-10 rounded-full bg-red-500/15 flex items-center justify-center flex-shrink-0">
               <svg class="w-5 h-5 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
               </svg>
             </div>
             <div>
-              <h3 class="font-display font-semibold text-white">Desactivar boleto</h3>
-              <p class="text-xs text-slate-500 mt-0.5">El boleto quedará inactivo y no podrá usarse</p>
+              <h3 class="font-display font-semibold text-white">Eliminar boleto</h3>
+              <p class="text-xs text-slate-500 mt-0.5">El boleto se borra y deja de ser válido</p>
             </div>
           </div>
           <p class="text-slate-400 text-sm mb-5">
-            ¿Desactivar el boleto <span class="text-violet-400 font-mono font-semibold">{{ cancelTarget.folio }}</span>
+            ¿Eliminar el boleto <span class="text-violet-400 font-mono font-semibold">{{ cancelTarget.folio }}</span>
             de <span class="text-white font-semibold">{{ cancelTarget.buyer?.name }}</span>?
           </p>
           <div class="flex gap-3">
             <button class="btn-nebula btn-ghost flex-1" @click="cancelTarget = null">No, mantener</button>
             <button class="btn-nebula btn-danger flex-1" :disabled="cancelling" @click="handleCancel">
-              {{ cancelling ? 'Desactivando...' : 'Sí, desactivar' }}
+              {{ cancelling ? 'Eliminando...' : 'Sí, eliminar' }}
             </button>
           </div>
         </div>
