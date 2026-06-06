@@ -18,8 +18,8 @@
 
     <!-- Navigation -->
     <nav class="flex-1 p-4 overflow-y-auto space-y-1">
-      <!-- Main — solo admins y scanners ven el dashboard -->
-      <div v-if="!authStore.isVendor || authStore.isAdmin" class="mb-4">
+      <!-- Main — solo admins ven el dashboard -->
+      <div v-if="authStore.isAdmin || (!authStore.isVendor && !authStore.isScanner)" class="mb-4">
         <p class="text-xs font-semibold text-slate-600 uppercase tracking-wider px-3 mb-2">Principal</p>
         <NuxtLink
           v-for="item in mainItems"
