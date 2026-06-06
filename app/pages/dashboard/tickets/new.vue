@@ -3,7 +3,7 @@
   <div class="w-full max-w-lg space-y-6">
 
     <!-- Aviso de vendedor bloqueado -->
-    <div v-if="!authStore.canSell && !authStore.isAdmin" class="card-nebula p-8 text-center">
+    <div v-if="isSellBlocked" class="card-nebula p-8 text-center">
       <div class="w-16 h-16 rounded-full bg-red-500/10 flex items-center justify-center mx-auto mb-4">
         <svg class="w-8 h-8 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/>
@@ -70,7 +70,7 @@
     </Transition>
 
     <!-- Formulario -->
-    <div v-if="!result && (authStore.canSell || authStore.isAdmin)" class="card-nebula p-8">
+    <div v-if="!result && !isSellBlocked" class="card-nebula p-8">
       <h2 class="font-display text-2xl font-bold text-white mb-1">Vender Boleto</h2>
       <p class="text-slate-500 text-sm mb-8">Selecciona el evento e ingresa los datos del comprador</p>
 
@@ -184,9 +184,15 @@
 <script setup lang="ts">
 definePageMeta({ layout: 'dashboard', middleware: 'auth' })
 
+const authStore = useAuthStore()
 const { $api } = useApi()
 const route = useRoute()
 const { success } = useToast()
+
+// Bloqueado solo si es vendedor puro con canSell = false explícitamente
+const isSellBlocked = computed(() =>
+  !authStore.isAdmin && !authStore.isSuperAdmin && authStore.user?.canSell === false,
+)
 
 interface Phase {
   id: string
