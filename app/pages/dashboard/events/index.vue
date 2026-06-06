@@ -1,10 +1,10 @@
 <template>
   <div class="space-y-6">
     <!-- Header -->
-    <div class="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
-      <div class="flex gap-3">
-        <input v-model="search" placeholder="Buscar evento..." class="input-nebula w-64">
-        <select v-model="statusFilter" class="input-nebula w-40">
+    <div class="flex flex-col gap-3">
+      <div class="flex flex-col sm:flex-row gap-2">
+        <input v-model="search" placeholder="Buscar evento..." class="input-nebula flex-1">
+        <select v-model="statusFilter" class="input-nebula sm:w-44">
           <option value="">Todos los estados</option>
           <option value="DRAFT">Borrador</option>
           <option value="ACTIVE">Activo</option>
@@ -12,7 +12,7 @@
           <option value="CANCELLED">Cancelado</option>
         </select>
       </div>
-      <NuxtLink v-if="authStore.canSell" to="/dashboard/events/new" class="btn-nebula btn-primary">
+      <NuxtLink v-if="authStore.canSell" to="/dashboard/events/new" class="btn-nebula btn-primary self-start">
         <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
         </svg>

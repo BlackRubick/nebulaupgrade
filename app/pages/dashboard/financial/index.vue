@@ -53,13 +53,13 @@
       </div>
 
       <!-- Phases Breakdown -->
-      <div class="card-nebula p-6">
+      <div class="card-nebula p-4 md:p-6">
         <h2 class="font-display font-semibold text-white mb-5">Desglose por fases</h2>
         <div class="overflow-x-auto">
           <table class="table-nebula">
             <thead>
               <tr>
-                <th>Evento</th>
+                <th class="hidden sm:table-cell">Evento</th>
                 <th>Fase</th>
                 <th>Precio</th>
                 <th>Vendidos</th>
@@ -68,7 +68,7 @@
             </thead>
             <tbody>
               <tr v-for="phase in data.phases" :key="phase.id">
-                <td class="text-slate-400 text-xs">{{ phase.eventName }}</td>
+                <td class="hidden sm:table-cell text-slate-400 text-xs">{{ phase.eventName }}</td>
                 <td class="font-medium text-slate-200">{{ phase.phaseName }}</td>
                 <td class="font-mono text-violet-400">${{ phase.price.toLocaleString('es-MX') }}</td>
                 <td class="font-mono text-slate-300">{{ phase.sold }}</td>
@@ -77,8 +77,9 @@
             </tbody>
             <tfoot>
               <tr>
-                <td colspan="4" class="font-bold text-slate-300 text-right">Total general</td>
-                <td class="font-mono font-bold text-emerald-400 text-lg">
+                <td colspan="3" class="hidden sm:table-cell font-bold text-slate-300 text-right">Total general</td>
+                <td colspan="2" class="sm:hidden font-bold text-slate-300 text-right">Total</td>
+                <td class="hidden sm:table-cell font-mono font-bold text-emerald-400 text-lg">
                   ${{ data.phases.reduce((s, p) => s + p.revenue, 0).toLocaleString('es-MX') }}
                 </td>
               </tr>

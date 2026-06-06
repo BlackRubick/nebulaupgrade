@@ -2,12 +2,12 @@
   <div class="space-y-5">
 
     <!-- ── HEADER FIJO (siempre visible) ────────────────── -->
-    <div class="flex items-center justify-between">
-      <div class="flex items-center gap-3">
-        <!-- Toggle vendedor/todos — solo admin, siempre en el mismo lugar -->
+    <div class="flex flex-wrap items-center justify-between gap-2">
+      <div class="flex items-center gap-2 flex-wrap">
+        <!-- Toggle vendedor/todos — solo admin -->
         <button
           v-if="authStore.isAdmin"
-          class="btn-nebula btn-secondary text-sm gap-2"
+          class="btn-nebula btn-secondary text-xs sm:text-sm gap-1.5"
           @click="mode === 'vendors' ? switchToAll() : backToVendors()"
         >
           <svg v-if="mode === 'vendors'" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -16,23 +16,25 @@
           <svg v-else class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
           </svg>
-          {{ mode === 'vendors' ? 'Ver todos los boletos' : 'Ver por vendedor' }}
+          <span class="hidden sm:inline">{{ mode === 'vendors' ? 'Ver todos los boletos' : 'Ver por vendedor' }}</span>
+          <span class="sm:hidden">{{ mode === 'vendors' ? 'Todos' : 'Vendedores' }}</span>
         </button>
         <!-- Info del vendedor seleccionado -->
         <div v-if="mode === 'tickets' && selectedVendor" class="flex items-center gap-2">
-          <div class="w-7 h-7 rounded-full bg-gradient-to-br from-violet-600 to-blue-600 flex items-center justify-center text-xs font-bold text-white">
+          <div class="w-6 h-6 rounded-full bg-gradient-to-br from-violet-600 to-blue-600 flex items-center justify-center text-xs font-bold text-white">
             {{ selectedVendor.name.charAt(0) }}
           </div>
-          <span class="text-white font-semibold text-sm">{{ selectedVendor.name }}</span>
+          <span class="text-white font-semibold text-sm truncate max-w-[120px] sm:max-w-none">{{ selectedVendor.name }}</span>
           <span class="text-xs text-violet-400 font-mono">{{ total }} boleto{{ total !== 1 ? 's' : '' }}</span>
         </div>
       </div>
-      <!-- Vender boleto — siempre en el mismo lugar -->
+      <!-- Vender boleto -->
       <NuxtLink v-if="authStore.canSell" to="/dashboard/tickets/new" class="btn-nebula btn-primary text-sm">
         <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
         </svg>
-        Vender boleto
+        <span class="hidden sm:inline">Vender boleto</span>
+        <span class="sm:hidden">Vender</span>
       </NuxtLink>
     </div>
 

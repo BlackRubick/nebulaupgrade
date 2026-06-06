@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-[calc(100vh-8rem)] flex items-center justify-center py-6">
+  <div class="flex items-start justify-center py-4 md:py-6 min-h-[calc(100vh-8rem)]">
   <div class="w-full max-w-lg space-y-6">
 
     <!-- Resultado exitoso -->

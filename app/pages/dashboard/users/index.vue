@@ -16,66 +16,68 @@
       <div v-if="loading" class="p-8 text-center">
         <div class="inline-block w-8 h-8 border-2 border-violet-500 border-t-transparent rounded-full animate-spin" />
       </div>
-      <table v-else class="table-nebula">
-        <thead>
-          <tr>
-            <th>Usuario</th>
-            <th>Email</th>
-            <th>Rol</th>
-            <th>Boletos</th>
-            <th>Estado</th>
-            <th>Creado</th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="user in users" :key="user.id">
-            <td>
-              <div class="flex items-center gap-2">
-                <div class="w-7 h-7 rounded-full bg-gradient-to-br from-violet-600 to-blue-600 flex items-center justify-center text-xs font-bold text-white">
-                  {{ user.name.charAt(0).toUpperCase() }}
+      <div v-else class="overflow-x-auto">
+        <table class="table-nebula">
+          <thead>
+            <tr>
+              <th>Usuario</th>
+              <th class="hidden sm:table-cell">Email</th>
+              <th>Rol</th>
+              <th class="hidden sm:table-cell">Boletos</th>
+              <th>Estado</th>
+              <th class="hidden md:table-cell">Creado</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="user in users" :key="user.id">
+              <td>
+                <div class="flex items-center gap-2">
+                  <div class="w-7 h-7 rounded-full bg-gradient-to-br from-violet-600 to-blue-600 flex items-center justify-center text-xs font-bold text-white flex-shrink-0">
+                    {{ user.name.charAt(0).toUpperCase() }}
+                  </div>
+                  <span class="font-medium text-slate-200 text-sm">{{ user.name }}</span>
                 </div>
-                <span class="font-medium text-slate-200">{{ user.name }}</span>
-              </div>
-            </td>
-            <td class="text-slate-400 text-xs font-mono">{{ user.email }}</td>
-            <td>
-              <span class="badge text-xs" :class="roleBadge(user.role)">{{ roleLabel(user.role) }}</span>
-            </td>
-            <td class="font-mono text-slate-300">{{ user._count?.tickets ?? 0 }}</td>
-            <td>
-              <span class="badge text-xs" :class="user.active ? 'badge-active' : 'badge-cancelled'">
-                {{ user.active ? 'Activo' : 'Inactivo' }}
-              </span>
-            </td>
-            <td class="text-slate-600 text-xs font-mono">{{ formatDate(user.createdAt) }}</td>
-            <td>
-              <div class="flex items-center gap-1">
-                <button
-                  v-if="!user.isSuperAdmin || authStore.isSuperAdmin"
-                  class="p-1.5 rounded-lg text-slate-500 hover:text-violet-400 hover:bg-violet-900/20 transition"
-                  title="Editar"
-                  @click="editUser = user"
-                >
-                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
-                  </svg>
-                </button>
-                <button
-                  v-if="user.id !== authStore.user?.id && (!user.isSuperAdmin || authStore.isSuperAdmin)"
-                  class="p-1.5 rounded-lg text-slate-500 hover:text-red-400 hover:bg-red-900/20 transition"
-                  title="Eliminar"
-                  @click="openDelete(user)"
-                >
-                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-                  </svg>
-                </button>
-              </div>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+              </td>
+              <td class="hidden sm:table-cell text-slate-400 text-xs font-mono">{{ user.email }}</td>
+              <td>
+                <span class="badge text-xs" :class="roleBadge(user.role)">{{ roleLabel(user.role) }}</span>
+              </td>
+              <td class="hidden sm:table-cell font-mono text-slate-300">{{ user._count?.tickets ?? 0 }}</td>
+              <td>
+                <span class="badge text-xs" :class="user.active ? 'badge-active' : 'badge-cancelled'">
+                  {{ user.active ? 'Activo' : 'Inactivo' }}
+                </span>
+              </td>
+              <td class="hidden md:table-cell text-slate-600 text-xs font-mono">{{ formatDate(user.createdAt) }}</td>
+              <td>
+                <div class="flex items-center gap-1">
+                  <button
+                    v-if="!user.isSuperAdmin || authStore.isSuperAdmin"
+                    class="p-1.5 rounded-lg text-slate-500 hover:text-violet-400 hover:bg-violet-900/20 transition"
+                    title="Editar"
+                    @click="editUser = user"
+                  >
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                    </svg>
+                  </button>
+                  <button
+                    v-if="user.id !== authStore.user?.id && (!user.isSuperAdmin || authStore.isSuperAdmin)"
+                    class="p-1.5 rounded-lg text-slate-500 hover:text-red-400 hover:bg-red-900/20 transition"
+                    title="Eliminar"
+                    @click="openDelete(user)"
+                  >
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                    </svg>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
 
     <!-- Create Modal -->

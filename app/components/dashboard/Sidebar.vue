@@ -2,7 +2,7 @@
   <!-- En mobile: se oculta por defecto y aparece como overlay al abrir -->
   <!-- En desktop (lg+): siempre visible fijo a la izquierda -->
   <aside
-    class="fixed left-0 top-0 h-full w-64 glass border-r border-purple-900/30 z-40 flex flex-col transition-transform duration-300"
+    class="fixed left-0 top-0 h-full w-72 sm:w-64 glass border-r border-purple-900/30 z-40 flex flex-col transition-transform duration-300"
     :class="isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'"
   >
     <!-- Logo -->

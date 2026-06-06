@@ -205,8 +205,8 @@
               <th>Evento</th>
               <th>Fase</th>
               <th>Precio</th>
-              <th v-if="authStore.isAdmin">Vendedor</th>
-              <th>Fecha</th>
+              <th v-if="authStore.isAdmin" class="hidden sm:table-cell">Vendedor</th>
+              <th class="hidden sm:table-cell">Fecha</th>
             </tr>
           </thead>
           <tbody>
@@ -220,8 +220,8 @@
                 </span>
               </td>
               <td class="font-mono font-semibold text-cyan-400">${{ Number(ticket.soldPrice).toLocaleString('es-MX') }}</td>
-              <td v-if="authStore.isAdmin" class="text-slate-500 text-xs">{{ ticket.seller?.name }}</td>
-              <td class="text-slate-600 text-xs font-mono">{{ formatDate(ticket.soldAt) }}</td>
+              <td v-if="authStore.isAdmin" class="hidden sm:table-cell text-slate-500 text-xs">{{ ticket.seller?.name }}</td>
+              <td class="hidden sm:table-cell text-slate-600 text-xs font-mono">{{ formatDate(ticket.soldAt) }}</td>
             </tr>
           </tbody>
         </table>
