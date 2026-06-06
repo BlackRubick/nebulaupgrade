@@ -19,7 +19,8 @@
       "Bash(xargs cat)",
       "Bash(xargs sed -i '' 's/getRequestIP\\(event, { xForwardedFor: true }\\)/getRequestIP\\(event\\)/g')",
       "Bash(npx nuxi *)",
-      "Bash(chmod +x *)"
+      "Bash(chmod +x *)",
+      "Bash(xargs ls)"
     ]
   }
 }

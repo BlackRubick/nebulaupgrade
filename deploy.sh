@@ -5,7 +5,7 @@
 # ─────────────────────────────────────────────────────
 set -e
 
-APP_DIR="/var/www/nebula-eventos"
+APP_DIR="/home/ubuntu/nebulaupgrade"
 
 echo "▶ Entrando al directorio..."
 cd "$APP_DIR"
