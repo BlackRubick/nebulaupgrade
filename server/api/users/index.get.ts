@@ -19,5 +19,9 @@ export default defineEventHandler(async (event) => {
     orderBy: { createdAt: 'desc' },
   })
 
-  return users
+  // Los boletos de super admin no cuentan como ventas
+  return users.map(u => ({
+    ...u,
+    _count: { tickets: u.isSuperAdmin ? 0 : u._count.tickets },
+  }))
 })
