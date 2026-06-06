@@ -15,6 +15,15 @@ const schema = z.object({
 
 export default defineEventHandler(async (event) => {
   const user = requireAdminOrVendor(event)
+
+  // Verificar que el vendedor tenga permiso de vender
+  if (!user.isSuperAdmin) {
+    const dbUser = await prisma.user.findUnique({ where: { id: user.userId }, select: { canSell: true } })
+    if (dbUser && dbUser.canSell === false) {
+      throw createError({ statusCode: 403, message: 'Tu cuenta no tiene permiso para vender boletos.' })
+    }
+  }
+
   const body = await readBody(event)
   const parsed = schema.safeParse(body)
   if (!parsed.success) {

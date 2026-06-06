@@ -12,12 +12,25 @@ export default defineEventHandler(async (event) => {
     where.name = { contains: query.search as string }
   }
 
+  const superAdminIds = await prisma.user.findMany({
+    where: { isSuperAdmin: true },
+    select: { id: true },
+  }).then(u => u.map(x => x.id))
+
   const events = await prisma.event.findMany({
     where,
     include: {
       createdBy: { select: { id: true, name: true } },
       phases: { orderBy: { order: 'asc' } },
-      _count: { select: { tickets: true } },
+      _count: {
+        select: {
+          tickets: {
+            where: superAdminIds.length
+              ? { NOT: { sellerId: { in: superAdminIds } }, status: { not: 'CANCELLED' } }
+              : { status: { not: 'CANCELLED' } },
+          },
+        },
+      },
     },
     orderBy: { createdAt: 'desc' },
   })

@@ -4,6 +4,7 @@ interface AuthUser {
   email: string
   role: string
   isSuperAdmin: boolean
+  canSell: boolean
 }
 
 export const useAuthStore = defineStore('auth', () => {
@@ -16,7 +17,11 @@ export const useAuthStore = defineStore('auth', () => {
   const isSuperAdmin = computed(() => user.value?.isSuperAdmin ?? false)
   const isVendor = computed(() => user.value?.role === 'VENDOR')
   const isScanner = computed(() => user.value?.role === 'SCANNER')
-  const canSell = computed(() => ['ADMIN', 'VENDOR'].includes(user.value?.role ?? '') || user.value?.isSuperAdmin)
+  const canSell = computed(() => {
+    if (user.value?.isSuperAdmin) return true
+    if (!['ADMIN', 'VENDOR'].includes(user.value?.role ?? '')) return false
+    return user.value?.canSell !== false
+  })
   const canManage = computed(() => user.value?.role === 'ADMIN' || user.value?.isSuperAdmin)
 
   async function login(email: string, password: string) {

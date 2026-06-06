@@ -10,6 +10,7 @@ const schema = z.object({
   password: z.string().min(8).optional(),
   role: z.enum(['ADMIN', 'VENDOR', 'SCANNER']).optional(),
   active: z.boolean().optional(),
+  canSell: z.boolean().optional(),
   isSuperAdmin: z.boolean().optional(),
 })
 
@@ -35,7 +36,7 @@ export default defineEventHandler(async (event) => {
   const updated = await prisma.user.update({
     where: { id },
     data,
-    select: { id: true, name: true, email: true, role: true, active: true },
+    select: { id: true, name: true, email: true, role: true, active: true, canSell: true },
   })
 
   // Strip password hash before logging — never store credential material in audit logs

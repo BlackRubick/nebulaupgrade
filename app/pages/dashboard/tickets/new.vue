@@ -2,6 +2,20 @@
   <div class="flex items-start justify-center py-4 md:py-6 min-h-[calc(100vh-8rem)]">
   <div class="w-full max-w-lg space-y-6">
 
+    <!-- Aviso de vendedor bloqueado -->
+    <div v-if="!authStore.canSell && !authStore.isAdmin" class="card-nebula p-8 text-center">
+      <div class="w-16 h-16 rounded-full bg-red-500/10 flex items-center justify-center mx-auto mb-4">
+        <svg class="w-8 h-8 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/>
+        </svg>
+      </div>
+      <h2 class="font-display text-xl font-bold text-white mb-2">Ventas desactivadas</h2>
+      <p class="text-slate-400 text-sm leading-relaxed">
+        Tu cuenta no tiene permiso para vender boletos en este momento.<br>
+        Contacta al administrador para más información.
+      </p>
+    </div>
+
     <!-- Resultado exitoso -->
     <Transition name="result">
       <div v-if="result" class="card-nebula p-8 text-center">
@@ -56,7 +70,7 @@
     </Transition>
 
     <!-- Formulario -->
-    <div v-if="!result" class="card-nebula p-8">
+    <div v-if="!result && (authStore.canSell || authStore.isAdmin)" class="card-nebula p-8">
       <h2 class="font-display text-2xl font-bold text-white mb-1">Vender Boleto</h2>
       <p class="text-slate-500 text-sm mb-8">Selecciona el evento e ingresa los datos del comprador</p>
 

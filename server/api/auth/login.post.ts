@@ -92,6 +92,7 @@ export default defineEventHandler(async (event) => {
       email: user.email,
       role: user.role,
       isSuperAdmin: user.isSuperAdmin,
+      canSell: user.canSell,
     },
   }
 })

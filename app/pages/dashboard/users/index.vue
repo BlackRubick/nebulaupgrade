@@ -52,6 +52,23 @@
               <td class="hidden md:table-cell text-slate-600 text-xs font-mono">{{ formatDate(user.createdAt) }}</td>
               <td>
                 <div class="flex items-center gap-1">
+                  <!-- Bloquear/permitir ventas — solo para vendedores -->
+                  <button
+                    v-if="user.role === 'VENDOR' && !user.isSuperAdmin"
+                    class="p-1.5 rounded-lg transition"
+                    :class="user.canSell
+                      ? 'text-emerald-500 hover:text-amber-400 hover:bg-amber-900/20'
+                      : 'text-red-400 hover:text-emerald-400 hover:bg-emerald-900/20'"
+                    :title="user.canSell ? 'Bloquear ventas' : 'Permitir ventas'"
+                    @click="toggleCanSell(user)"
+                  >
+                    <svg v-if="user.canSell" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                    </svg>
+                    <svg v-else class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/>
+                    </svg>
+                  </button>
                   <button
                     v-if="!user.isSuperAdmin || authStore.isSuperAdmin"
                     class="p-1.5 rounded-lg text-slate-500 hover:text-violet-400 hover:bg-violet-900/20 transition"
@@ -208,6 +225,7 @@ interface User {
   role: string
   isSuperAdmin: boolean
   active: boolean
+  canSell: boolean
   createdAt: string
   _count?: { tickets: number }
 }
@@ -273,6 +291,16 @@ async function handleUpdate() {
   finally {
     updating.value = false
   }
+}
+
+async function toggleCanSell(user: User) {
+  const newVal = !user.canSell
+  await $api(`/users/${user.id}`, { method: 'PUT', body: JSON.stringify({ canSell: newVal }) })
+  success(
+    newVal ? 'Ventas permitidas' : 'Ventas bloqueadas',
+    newVal ? `${user.name} ya puede vender boletos` : `${user.name} ya no puede vender boletos`,
+  )
+  await fetchUsers()
 }
 
 function openDelete(user: User) {

@@ -5,12 +5,25 @@ export default defineEventHandler(async (event) => {
   const user = requireAuth(event)
   const id = getRouterParam(event, 'id')!
 
+  const superAdminIds = await prisma.user.findMany({
+    where: { isSuperAdmin: true },
+    select: { id: true },
+  }).then(u => u.map(x => x.id))
+
   const ev = await prisma.event.findUnique({
     where: { id },
     include: {
       createdBy: { select: { id: true, name: true, email: true } },
       phases: { orderBy: { order: 'asc' } },
-      _count: { select: { tickets: true } },
+      _count: {
+        select: {
+          tickets: {
+            where: superAdminIds.length
+              ? { NOT: { sellerId: { in: superAdminIds } }, status: { not: 'CANCELLED' } }
+              : { status: { not: 'CANCELLED' } },
+          },
+        },
+      },
     },
   })
 
