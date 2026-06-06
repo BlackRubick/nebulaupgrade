@@ -198,7 +198,9 @@
             <div class="flex items-center justify-between pt-3 border-t border-purple-900/20">
               <span class="font-mono font-bold text-cyan-400">${{ Number(ticket.soldPrice).toLocaleString('es-MX') }}</span>
               <div class="flex items-center gap-1">
+                <!-- QR — solo admin -->
                 <button
+                  v-if="authStore.isAdmin"
                   class="p-1.5 rounded-lg text-slate-500 hover:text-violet-400 hover:bg-violet-900/20 transition"
                   title="Ver QR"
                   @click="selectedTicket = ticket"
@@ -208,14 +210,28 @@
                     <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 6.75h.75v.75h-.75v-.75ZM6.75 16.5h.75v.75h-.75v-.75ZM16.5 6.75h.75v.75h-.75v-.75ZM13.5 13.5h.75v.75h-.75v-.75ZM13.5 19.5h.75v.75h-.75v-.75ZM19.5 13.5h.75v.75h-.75v-.75ZM19.5 19.5h.75v.75h-.75v-.75ZM16.5 16.5h.75v.75h-.75v-.75Z"/>
                   </svg>
                 </button>
+                <!-- WhatsApp reenvío — solo admin -->
+                <a
+                  v-if="authStore.isAdmin && ticket.status !== 'CANCELLED'"
+                  :href="whatsappUrl(ticket)"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="p-1.5 rounded-lg text-slate-500 hover:text-emerald-400 hover:bg-emerald-900/20 transition"
+                  title="Reenviar por WhatsApp"
+                >
+                  <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+                  </svg>
+                </a>
+                <!-- Eliminar (desactivar) — solo admin -->
                 <button
-                  v-if="authStore.isAdmin"
+                  v-if="authStore.isAdmin && ticket.status !== 'CANCELLED'"
                   class="p-1.5 rounded-lg text-slate-500 hover:text-red-400 hover:bg-red-900/20 transition"
-                  title="Eliminar"
+                  title="Desactivar boleto"
                   @click="cancelTarget = ticket"
                 >
                   <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/>
                   </svg>
                 </button>
               </div>
@@ -234,29 +250,29 @@
       </div>
     </template>
 
-    <!-- ── MODAL ELIMINAR ─────────────────────────────── -->
+    <!-- ── MODAL DESACTIVAR ──────────────────────────── -->
     <Transition name="modal">
       <div v-if="cancelTarget" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm" @click.self="cancelTarget = null">
         <div class="card-nebula p-6 w-full max-w-sm">
           <div class="flex items-center gap-3 mb-4">
             <div class="w-10 h-10 rounded-full bg-red-500/15 flex items-center justify-center flex-shrink-0">
               <svg class="w-5 h-5 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/>
               </svg>
             </div>
             <div>
-              <h3 class="font-display font-semibold text-white">Eliminar boleto</h3>
-              <p class="text-xs text-slate-500 mt-0.5">Esta acción no se puede deshacer</p>
+              <h3 class="font-display font-semibold text-white">Desactivar boleto</h3>
+              <p class="text-xs text-slate-500 mt-0.5">El boleto quedará inactivo y no podrá usarse</p>
             </div>
           </div>
           <p class="text-slate-400 text-sm mb-5">
-            ¿Eliminar el boleto <span class="text-violet-400 font-mono font-semibold">{{ cancelTarget.folio }}</span>
+            ¿Desactivar el boleto <span class="text-violet-400 font-mono font-semibold">{{ cancelTarget.folio }}</span>
             de <span class="text-white font-semibold">{{ cancelTarget.buyer?.name }}</span>?
           </p>
           <div class="flex gap-3">
             <button class="btn-nebula btn-ghost flex-1" @click="cancelTarget = null">No, mantener</button>
             <button class="btn-nebula btn-danger flex-1" :disabled="cancelling" @click="handleCancel">
-              {{ cancelling ? 'Eliminando...' : 'Sí, eliminar' }}
+              {{ cancelling ? 'Desactivando...' : 'Sí, desactivar' }}
             </button>
           </div>
         </div>
@@ -277,7 +293,21 @@
             <p>Fase: <span class="text-slate-200">{{ selectedTicket.phase?.phaseName }}</span></p>
             <p>Precio: <span class="text-cyan-400 font-mono font-bold">${{ Number(selectedTicket.soldPrice).toLocaleString('es-MX') }}</span></p>
           </div>
-          <button class="btn-nebula btn-ghost w-full" @click="selectedTicket = null">Cerrar</button>
+          <div class="flex gap-2">
+            <a
+              :href="whatsappUrl(selectedTicket)"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="flex items-center justify-center gap-2 flex-1 py-2.5 rounded-xl font-semibold text-sm text-white transition-all"
+              style="background:#25D366;"
+            >
+              <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+              </svg>
+              Reenviar
+            </a>
+            <button class="btn-nebula btn-ghost flex-1" @click="selectedTicket = null">Cerrar</button>
+          </div>
         </div>
       </div>
     </Transition>
@@ -403,6 +433,27 @@ async function handleCancel() {
     await fetchTickets()
   }
   finally { cancelling.value = false }
+}
+
+function whatsappUrl(ticket: Ticket) {
+  const appUrl = window.location.origin
+  const digits = (ticket.buyer?.phone ?? '').replace(/\D/g, '')
+  const phone = digits.startsWith('52') ? digits : `52${digits}`
+  const link = `${appUrl}/ticket/${ticket.uuid}`
+  const msg = [
+    `¡Hola ${ticket.buyer?.name}!`,
+    ``,
+    `Aquí está tu boleto para *${ticket.event?.name ?? 'el evento'}*.`,
+    ``,
+    `*Folio:* ${ticket.folio}`,
+    `*Fase:* ${ticket.phase?.phaseName ?? ''}`,
+    ``,
+    `Accede a tu boleto aquí:`,
+    link,
+    ``,
+    `¡Nos vemos pronto!`,
+  ].join('\n')
+  return `https://wa.me/${phone}?text=${encodeURIComponent(msg)}`
 }
 
 function ticketBadge(s: string) {

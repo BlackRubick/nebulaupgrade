@@ -261,7 +261,7 @@ function whatsappUrl(ticket: SaleResult['tickets'][0]) {
 
   const link = `${appUrl}/ticket/${ticket.uuid}`
   const msg = [
-    `¡Hola ${ticket.buyer?.name}! 🎟️`,
+    `¡Hola ${ticket.buyer?.name}!`,
     ``,
     `Aquí está tu boleto para *${ticket.event?.name ?? 'el evento'}*.`,
     ``,
@@ -271,7 +271,7 @@ function whatsappUrl(ticket: SaleResult['tickets'][0]) {
     `Accede a tu boleto aquí:`,
     link,
     ``,
-    `¡Nos vemos pronto! 🎉`,
+    `¡Nos vemos pronto!`,
   ].join('\n')
 
   return `https://wa.me/${phone}?text=${encodeURIComponent(msg)}`
