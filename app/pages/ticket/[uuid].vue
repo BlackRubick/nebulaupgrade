@@ -20,7 +20,7 @@
       <!-- Template + QR -->
       <div ref="ticketRef" class="relative w-full shadow-2xl shadow-black/60 rounded-2xl overflow-hidden">
         <img
-          src="/images/laperrera.jpg"
+          src="/images/2.jpg"
           alt="Boleto La Perrera"
           class="w-full block"
           draggable="false"
@@ -149,7 +149,7 @@ async function downloadTicket() {
     const ctx = canvas.getContext('2d')!
 
     // Cargar template
-    const template = await loadImage('/images/laperrera.jpg')
+    const template = await loadImage('/images/2.jpg')
     canvas.width  = template.naturalWidth
     canvas.height = template.naturalHeight
     ctx.drawImage(template, 0, 0)
