@@ -128,7 +128,7 @@ model Ticket {
   buyerId    String
   buyer      Buyer        @relation(fields: [buyerId], references: [id])
   eventId    String
-  event      Event        @relation(fields: [eventId], references: [id])
+  event      Event        @relation(fields: [eventId], references: [id], onDelete: Cascade)
   createdAt  DateTime     @default(now())
   updatedAt  DateTime     @updatedAt
 
@@ -144,7 +144,7 @@ model ScanLog {
   scannerId  String
   scanner    User     @relation(fields: [scannerId], references: [id])
   eventId    String
-  event      Event    @relation(fields: [eventId], references: [id])
+  event      Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
   scannedAt  DateTime @default(now())
   ipAddress  String?
 
