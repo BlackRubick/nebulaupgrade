@@ -166,7 +166,7 @@ async function downloadTicket() {
 
     // Dibujar QR centrado con padding
     const qrImg = await loadImage(ticket.value.qrCode)
-    const padding = w * 0.04
+    const padding = w * 0.08
     ctx.drawImage(qrImg, x + padding, y + padding, w - padding * 2, h - padding * 2)
 
     // Descargar
