@@ -164,10 +164,15 @@ async function downloadTicket() {
     ctx.fillStyle = '#ffffff'
     ctx.fillRect(x, y, w, h)
 
-    // Dibujar QR centrado con padding
+    // Dibujar QR cuadrado centrado (igual que object-contain en la preview)
     const qrImg = await loadImage(ticket.value.qrCode)
-    const padding = w * 0.08
-    ctx.drawImage(qrImg, x + padding, y + padding, w - padding * 2, h - padding * 2)
+    const padding = w * 0.04
+    const innerW = w - padding * 2
+    const innerH = h - padding * 2
+    const qrSize = Math.min(innerW, innerH)
+    const qrX = x + padding + (innerW - qrSize) / 2
+    const qrY = y + padding + (innerH - qrSize) / 2
+    ctx.drawImage(qrImg, qrX, qrY, qrSize, qrSize)
 
     // Descargar
     const a = document.createElement('a')
